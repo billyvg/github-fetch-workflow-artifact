@@ -1,14 +1,14 @@
-import {GetResponseDataTypeFromEndpointMethod} from '@octokit/types';
-import * as core from '@actions/core';
-import * as github from '@actions/github';
+import { GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
+import * as core from "@actions/core";
+import * as github from "@actions/github";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 type WorkflowRun = GetResponseDataTypeFromEndpointMethod<
-  Octokit['actions']['listWorkflowRuns']
->['workflow_runs'][number];
+  Octokit["actions"]["listWorkflowRuns"]
+>["workflow_runs"][number];
 type Artifacts = GetResponseDataTypeFromEndpointMethod<
-  Octokit['actions']['listWorkflowRunArtifacts']
->['artifacts'][number];
+  Octokit["actions"]["listWorkflowRunArtifacts"]
+>["artifacts"][number];
 
 export type GetArtifactsForBranchAndWorkflowReturn = {
   artifact: Artifacts;
@@ -46,7 +46,7 @@ export async function getArtifactsForBranchAndWorkflow(
 ): Promise<GetArtifactsForBranchAndWorkflowReturn> {
   core.debug(
     `Fetching workflow ${workflow_id} in branch: ${branch}${
-      commit ? ` and commit: ${commit}` : ''
+      commit ? ` and commit: ${commit}` : ""
     }...`
   );
 
@@ -59,9 +59,9 @@ export async function getArtifactsForBranchAndWorkflow(
       owner,
       repo,
       // Below is typed incorrectly, it needs to be a string but typed as number
-      workflow_id: (workflow_id as unknown) as number,
+      workflow_file_name: (workflow_id as unknown) as number,
       branch,
-      status: 'completed',
+      status: "completed",
       per_page: 100,
     }
   )) {
@@ -88,7 +88,7 @@ export async function getArtifactsForBranchAndWorkflow(
     if (currentPage > MAX_PAGES) {
       core.warning(
         `Workflow ${workflow_id} not found in branch: ${branch}${
-          commit ? ` and commit: ${commit}` : ''
+          commit ? ` and commit: ${commit}` : ""
         }`
       );
       return null;
@@ -102,7 +102,7 @@ export async function getArtifactsForBranchAndWorkflow(
     core.debug(`Checking artifacts for workflow run: ${workflowRun.html_url}`);
 
     const {
-      data: {artifacts},
+      data: { artifacts },
     } = await octokit.actions.listWorkflowRunArtifacts({
       owner,
       repo,
@@ -114,7 +114,7 @@ export async function getArtifactsForBranchAndWorkflow(
         `Unable to fetch artifacts for branch: ${branch}, workflow: ${workflow_id}, workflowRunId: ${workflowRun.id}`
       );
     } else {
-      const foundArtifact = artifacts.find(({name}) => name === artifactName);
+      const foundArtifact = artifacts.find(({ name }) => name === artifactName);
       if (foundArtifact) {
         core.debug(`Found suitable artifact: ${foundArtifact.url}`);
         return {
