@@ -2,6 +2,12 @@ import { GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
+type Await<T> = T extends {
+  then(onfulfilled?: (value: infer U) => unknown): unknown;
+}
+  ? U
+  : T;
+
 type Octokit = ReturnType<typeof github.getOctokit>;
 type WorkflowRun = GetResponseDataTypeFromEndpointMethod<
   Octokit["actions"]["listWorkflowRuns"]
@@ -53,19 +59,22 @@ export async function getArtifactsForBranchAndWorkflow(
   let currentPage = 0;
   let completedWorkflowRuns: WorkflowRun[] = [];
 
+  // @ts-ignore
   for await (const response of octokit.paginate.iterator(
     octokit.actions.listWorkflowRuns,
     {
       owner,
       repo,
       // Below is typed incorrectly, it needs to be a string but typed as number
-      workflow_file_name: (workflow_id as unknown) as number,
+      workflow_id: (workflow_id as unknown) as number,
       branch,
       status: "completed",
       per_page: 100,
     }
   )) {
-    const workflowRuns = response.data;
+    const workflowRuns = (response.data as unknown) as Await<
+      ReturnType<typeof octokit.actions.listWorkflowRuns>
+    >["data"]["workflow_runs"];
 
     if (!workflowRuns.length) {
       core.warning(`Workflow ${workflow_id} not found in branch ${branch}`);
