@@ -28,6 +28,21 @@ test("downloads and extracts artifact", async function () {
     downloadPath: ".artifacts",
   });
 
+  expect(octokit.actions.listWorkflowRuns).toHaveBeenCalledWith({
+    owner: "getsentry",
+    repo: "sentry",
+    workflow_id: "workflow_id",
+    branch: "main",
+    per_page: 10,
+    status: "completed",
+  });
+
+  expect(octokit.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
+    owner: "getsentry",
+    repo: "sentry",
+    run_id: 152081708,
+  });
+
   expect(io.mkdirP).toHaveBeenCalledWith(".artifacts");
   expect(exec.exec).toHaveBeenCalledWith(
     "wget",

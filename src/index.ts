@@ -17,14 +17,13 @@ export class NoArtifactsError extends Error {}
 
 export default async function download(
   octokit: ReturnType<typeof github.getOctokit>,
-  { owner, repo, artifactName, workflow_id, branch, downloadPath }: Params
+  { owner, repo, artifactName, downloadPath, ...params}: Params
 ) {
   const artifacts = await getArtifactsForBranchAndWorkflow(octokit, {
     owner,
     repo,
-    workflow_id,
-    branch,
     artifactName,
+    ...params,
   });
 
   if (!artifacts) {

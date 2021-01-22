@@ -28,10 +28,14 @@ export type GetArtifactsForBranchAndWorkflow = {
   workflow_id: string;
   artifactName: string;
   commit?: string;
+  perPage?: number;
+  maxPages?: number;
 };
 
 // max pages of workflows to pagination through
-const MAX_PAGES = 5;
+const DEFAULT_MAX_PAGES = 50;
+// max results per page
+const DEFAULT_PAGE_LIMIT = 10;
 
 /**
  * Fetch artifacts from a workflow run from a branch
@@ -48,6 +52,8 @@ export async function getArtifactsForBranchAndWorkflow(
     branch,
     commit,
     artifactName,
+    maxPages,
+    perPage,
   }: GetArtifactsForBranchAndWorkflow
 ): Promise<GetArtifactsForBranchAndWorkflowReturn> {
   core.debug(
@@ -69,7 +75,7 @@ export async function getArtifactsForBranchAndWorkflow(
       workflow_id: (workflow_id as unknown) as number,
       branch,
       status: "completed",
-      per_page: 100,
+      per_page: perPage || DEFAULT_PAGE_LIMIT,
     }
   )) {
     const workflowRuns = (response.data as unknown) as Await<
@@ -94,7 +100,7 @@ export async function getArtifactsForBranchAndWorkflow(
       break;
     }
 
-    if (currentPage > MAX_PAGES) {
+    if (currentPage > (maxPages ?? DEFAULT_MAX_PAGES)) {
       core.warning(
         `Workflow ${workflow_id} not found in branch: ${branch}${
           commit ? ` and commit: ${commit}` : ""
