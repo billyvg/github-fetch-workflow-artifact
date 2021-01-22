@@ -10,6 +10,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepublishOnly": "yarn tsc",
     "test": "jest"
   },
   "repository": {
