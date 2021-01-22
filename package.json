@@ -1,6 +1,6 @@
 {
   "name": "github-fetch-workflow-artifact",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Download a GitHub Workflow Artifact using GitHub Actions",
   "main": "lib/index.js",
   "files": [
