@@ -34,7 +34,7 @@ test("downloads and extracts artifact", async function () {
     workflow_id: "workflow_id",
     branch: "main",
     per_page: 10,
-    status: "completed",
+    status: "success",
   });
 
   expect(octokit.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
