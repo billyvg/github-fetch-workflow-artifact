@@ -28,7 +28,7 @@ test("downloads and extracts artifact", async function () {
     downloadPath: ".artifacts",
   });
 
-  expect(octokit.actions.listWorkflowRuns).toHaveBeenCalledWith({
+  expect(octokit.rest.actions.listWorkflowRuns).toHaveBeenCalledWith({
     owner: "getsentry",
     repo: "sentry",
     workflow_id: "workflow_id",
@@ -37,7 +37,7 @@ test("downloads and extracts artifact", async function () {
     status: "success",
   });
 
-  expect(octokit.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
+  expect(octokit.rest.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
     owner: "getsentry",
     repo: "sentry",
     run_id: 152081708,

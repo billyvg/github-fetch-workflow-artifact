@@ -27,7 +27,7 @@ export async function downloadOtherWorkflowArtifact(
     downloadPath,
   }: DownloadArtifactParams
 ) {
-  const artifact = await octokit.actions.downloadArtifact({
+  const artifact = await octokit.rest.actions.downloadArtifact({
     owner,
     repo,
     artifact_id: artifactId,
