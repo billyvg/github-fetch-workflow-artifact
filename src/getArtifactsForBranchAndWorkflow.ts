@@ -138,7 +138,7 @@ export async function getArtifactsForBranchAndWorkflow(
       branch,
       status: "success",
       per_page: perPage || DEFAULT_PAGE_LIMIT,
-      ...(workflowEvent ? {event: workflowEvent} : {}),
+      ...(workflowEvent ? { event: workflowEvent } : {}),
     }
   )) {
     if (!response.data.length) {

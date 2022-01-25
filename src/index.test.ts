@@ -16,7 +16,7 @@ jest.mock("@actions/exec", () => ({
   exec: jest.fn(),
 }));
 
-test("downloads and extracts artifact", async function () {
+test("downloads and extracts artifact using a workflow name", async function () {
   const octokit = getOctokit("token");
 
   const downloadResult = await download(octokit, {
