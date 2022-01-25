@@ -7,17 +7,19 @@ import {
   GetArtifactsForBranchAndWorkflow,
 } from "./getArtifactsForBranchAndWorkflow";
 
-import { downloadOtherWorkflowArtifact } from "./downloadOtherWorkflowArtifact";
+import {
+  DownloadArtifactParams,
+  downloadOtherWorkflowArtifact,
+} from "./downloadOtherWorkflowArtifact";
 
-type Params = {
-  downloadPath: string;
-} & GetArtifactsForBranchAndWorkflow;
+type Params = GetArtifactsForBranchAndWorkflow &
+  Omit<DownloadArtifactParams, "artifactId">;
 
 export class NoArtifactsError extends Error {}
 
 export default async function download(
   octokit: ReturnType<typeof github.getOctokit>,
-  { owner, repo, artifactName, downloadPath, ...params}: Params
+  { owner, repo, artifactName, downloadPath, ...params }: Params
 ) {
   const artifacts = await getArtifactsForBranchAndWorkflow(octokit, {
     owner,

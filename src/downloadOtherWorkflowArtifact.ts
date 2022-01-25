@@ -5,7 +5,7 @@ import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 import * as io from "@actions/io";
 
-type DownloadArtifactParams = {
+export type DownloadArtifactParams = {
   owner: string;
   repo: string;
   artifactId: number;
@@ -26,8 +26,8 @@ export async function downloadOtherWorkflowArtifact(
     artifactName,
     downloadPath,
   }: DownloadArtifactParams
-) {
-  const artifact = await octokit.actions.downloadArtifact({
+): Promise<void> {
+  const artifact = await octokit.rest.actions.downloadArtifact({
     owner,
     repo,
     artifact_id: artifactId,
@@ -59,6 +59,4 @@ export async function downloadOtherWorkflowArtifact(
   await exec("unzip", ["-q", "-d", downloadPath, downloadFile], {
     silent: true,
   });
-
-  return true;
 }
