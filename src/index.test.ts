@@ -1,7 +1,7 @@
 import * as io from "@actions/io";
-import * as github from "@actions/github";
+import { getOctokit } from "@actions/github";
 import * as exec from "@actions/exec";
-import fetchWorkflowArtifact from "./index";
+import download from "./index";
 
 jest.mock("path", () => ({
   resolve: () => "/",
@@ -17,28 +17,28 @@ jest.mock("@actions/exec", () => ({
 }));
 
 test("downloads and extracts artifact", async function () {
-  const octokit = github.getOctokit("token");
+  const octokit = getOctokit("token");
 
-  const downloadResult = await fetchWorkflowArtifact(octokit, {
-    owner: "getsentry",
+  const downloadResult = await download(octokit, {
+    owner: "billyvg",
     repo: "sentry",
     artifactName: "visual-snapshots",
-    workflow_id: "workflow_id",
+    workflowName: "workflowName",
     branch: "main",
     downloadPath: ".artifacts",
   });
 
   expect(octokit.rest.actions.listWorkflowRuns).toHaveBeenCalledWith({
-    owner: "getsentry",
+    owner: "billyvg",
     repo: "sentry",
-    workflow_id: "workflow_id",
+    workflow_id: 1234,
     branch: "main",
     per_page: 10,
     status: "success",
   });
 
   expect(octokit.rest.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
-    owner: "getsentry",
+    owner: "billyvg",
     repo: "sentry",
     run_id: 152081708,
   });
@@ -70,8 +70,7 @@ test("downloads and extracts artifact", async function () {
       node_id: "MDg6QXJ0aWZhY3Q5ODA4OTE5",
       size_in_bytes: 11768446,
       updated_at: "2020-06-29T23:56:40Z",
-      url:
-        "https://api.github.com/repos/billyvg/sentry/actions/artifacts/9808919",
+      url: "https://api.github.com/repos/billyvg/sentry/actions/artifacts/9808919",
     },
     workflowRun: {
       artifacts_url:
@@ -92,7 +91,7 @@ test("downloads and extracts artifact", async function () {
         timestamp: "2020-06-29T23:42:25Z",
         tree_id: "332a699162888947ea062892169d9d81a9c906fe",
       },
-      head_repository: {},
+      head_repository: {full_name: 'billyvg/sentry'},
       head_sha: "5e19cbbea129a173dc79d4634df0fdaece933b06",
       html_url: "https://github.com/billyvg/sentry/actions/runs/152081708",
       id: 152081708,
@@ -114,4 +113,37 @@ test("downloads and extracts artifact", async function () {
         "https://api.github.com/repos/billyvg/sentry/actions/workflows/1154499",
     },
   });
+});
+
+test("downloads and extracts artifact from workflow from specific workflow event", async function () {
+  const octokit = getOctokit("token");
+
+  const downloadResult = await download(octokit, {
+    owner: "billyvg",
+    repo: "sentry",
+    artifactName: "visual-snapshots",
+    workflowName: "workflowName",
+    branch: "main",
+    downloadPath: ".artifacts",
+    workflowEvent: "push",
+
+  });
+
+  expect(octokit.rest.actions.listWorkflowRuns).toHaveBeenCalledWith({
+    owner: "billyvg",
+    repo: "sentry",
+    workflow_id: 1234,
+    branch: "main",
+    per_page: 10,
+    status: "success",
+    event: "push",
+  });
+
+  expect(octokit.rest.actions.listWorkflowRunArtifacts).toHaveBeenCalledWith({
+    owner: "billyvg",
+    repo: "sentry",
+    run_id: 152081708,
+  });
+
+  expect(downloadResult).not.toBeUndefined();
 });
